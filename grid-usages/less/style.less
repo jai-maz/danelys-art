@@ -1,0 +1,80 @@
+#-theme() {//http://lesscss.org/#maps
+  fg: #ddd;
+  bg: #222;
+  gap: 0.25em;
+}
+
+body {
+  display:grid;
+  grid-template-columns:50vw;
+  justify-content:center;
+  overflow-x:hidden;
+  margin-bottom:3em;
+}
+
+h2 {
+  justify-self:center;
+  margin:3em 0;
+  font:1em monospace;
+}
+
+.waterfall {
+  @h:100px, 120px, 160px;
+  @gcd:20px; //http://www.alcula.com/calculators/math/gcd/
+  @width:minmax(133px, 1fr);
+  
+  display:grid;
+  grid-template-columns:repeat(auto-fill, @width);
+  grid-gap:#-theme()[gap];
+  grid-auto-flow:row dense;
+  grid-auto-rows:@gcd;
+  
+  .item {
+    width:100%;
+    background:#-theme[bg];
+    color:#-theme[fg];
+  }
+  
+  //http://lesscss.org/functions/#list-functions-extract
+  .item:nth-of-type(3n+1) { grid-row:auto/span unit(extract(@h, 1) / @gcd) }
+  .item:nth-of-type(3n+2) { grid-row:auto/span unit(extract(@h, 2) / @gcd) }
+  .item:nth-of-type(3n+3) { grid-row:auto/span unit(extract(@h, 3) / @gcd) } 
+}
+
+.brickwall {
+  @height:minmax(133px, 20vmin);
+  
+  display:grid;
+  grid-gap:#-theme()[gap];
+  grid-auto-flow:row dense;
+  grid-auto-rows:@height;
+  grid-template-columns:1fr;
+  
+  @media (min-width:512px) {
+    @cr: 2 2 3
+         2 3 2 
+         3 2 2;//...more combinations, less dull
+    grid-template-columns:repeat(7, 1fr);
+    #-f(length(@cr));
+    @media (min-width:1024px) {
+      @cr: 2 3 3 3 3 
+           3 3 3 3 2 
+           3 3 2 3 3;
+      grid-template-columns:repeat(14, 1fr);
+      #-f(length(@cr));
+    }
+  }
+  
+  .item {
+    height:100%;
+    background:#-theme()[bg];
+    color:#-theme()[fg];
+  }
+  
+  #-f(@l; @i:1) when (@i =< @l) {//http://lesscss.org/features/#mixins-feature-loops-feature
+    #-f(@l; @i + 1);
+    .item:nth-of-type(@{l}n + @{i}) {
+      grid-column:auto/span extract(@cr, @i);
+    }
+  }
+}
